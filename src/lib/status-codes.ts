@@ -1,0 +1,257 @@
+export const STATUS_CODES: {
+  code: number;
+  name: string;
+  description: string;
+  deprecated?: boolean;
+  outsideSpec?: boolean;
+  specificTo?: string;
+}[] = [
+  {
+    code: 100,
+    name: 'Continue',
+    description: 'The HTTP session is progressing as expected and is asking the client to continue to the next step',
+  },
+  {
+    code: 101,
+    name: 'Switching Protocols',
+    description: 'The HTTP session can continue and the server is switching to a new protocol',
+  },
+  {
+    code: 102,
+    name: 'Processing',
+    description: 'Indicates a significant delay before the final HTTP response is sent',
+  },
+  { code: 103, name: 'Early Hints', description: 'Sends HTTP headers to a client in advance of a final HTTP response' },
+  { code: 110, name: 'Response is stale', description: 'Response is stale', deprecated: true },
+  { code: 111, name: 'Revalidation failed', description: 'Revalidation failed', deprecated: true },
+  {
+    code: 112,
+    name: 'Disconnected operation',
+    description: 'Disconnected operation',
+    deprecated: true,
+  },
+  { code: 113, name: 'Heuristic expiration', description: 'Heuristic expiration', deprecated: true },
+  {
+    code: 199,
+    name: 'Miscellaneous warning',
+    description: 'Miscellaneous warning',
+    deprecated: true,
+  },
+
+  { code: 200, name: 'OK', description: 'Request was successful' },
+  { code: 201, name: 'Created', description: 'Resource was created' },
+  { code: 202, name: 'Accepted', description: 'Request was accepted' },
+  {
+    code: 203,
+    name: 'Non-Authoritative Information',
+    description: 'Request was successful but returned meta-information',
+  },
+  { code: 204, name: 'No Content', description: 'Request was successful but no content was returned' },
+  {
+    code: 205,
+    name: 'Reset Content',
+    description: 'Request was successful but no content was returned and the client should reset the document view',
+  },
+  { code: 206, name: 'Partial Content', description: 'Request was successful but only partial content was returned' },
+  { code: 207, name: 'Multi-Status', description: 'The message body that follows is an XML message' },
+  { code: 208, name: 'Already Reported', description: 'The members of a DAV binding have already been enumerated' },
+  {
+    code: 214,
+    name: 'Transformation applied',
+    description: 'Transformation applied',
+    deprecated: true,
+  },
+  {
+    code: 218,
+    name: 'This is fine',
+    description: 'A catch-all error condition allowing the passage of message bodies through the server',
+    outsideSpec: true,
+    specificTo: 'Apache Web Server',
+  },
+  { code: 226, name: 'IM Used', description: 'The server has fulfilled a request for the resource' },
+  {
+    code: 299,
+    name: 'Miscellaneous persistent warning',
+    description: 'Miscellaneous persistent warning',
+    deprecated: true,
+  },
+  {
+    code: 300,
+    name: 'Multiple Choices',
+    description: 'Indicates multiple options for the resource that the client may follow',
+  },
+  {
+    code: 301,
+    name: 'Moved Permanently',
+    description: 'This and all future requests should be directed to the given URI',
+  },
+  { code: 302, name: 'Found', description: 'Tells the client to look at another URL' },
+  { code: 303, name: 'See Other', description: 'The response to the request can be found under another URI' },
+  { code: 304, name: 'Not Modified', description: 'The resource has not been modified since the last request' },
+  { code: 305, name: 'Use Proxy', description: 'The requested resource is only available through a proxy' },
+  { code: 306, name: 'Switch Proxy', description: 'No longer used' },
+  { code: 307, name: 'Temporary Redirect', description: 'The request should be repeated with another URI' },
+  {
+    code: 308,
+    name: 'Permanent Redirect',
+    description: 'This and all future requests should be directed to the given URI',
+  },
+  { code: 400, name: 'Bad Request', description: 'Request was successful but there was an error in the body' },
+  {
+    code: 401,
+    name: 'Unauthorized',
+    description: 'Authentication is required and has failed or has not yet been provided',
+  },
+  { code: 402, name: 'Payment Required', description: 'Reserved for future use' },
+  { code: 403, name: 'Forbidden', description: 'The request was valid but the server is refusing action' },
+  { code: 404, name: 'Not Found', description: 'The requested resource could not be found' },
+  {
+    code: 405,
+    name: 'Method Not Allowed',
+    description: 'The request method is not supported by the requested resource',
+  },
+  {
+    code: 406,
+    name: 'Not Acceptable',
+    description:
+      'The requested resource is capable of generating only content not acceptable according to the Accept headers sent in the request',
+  },
+  {
+    code: 407,
+    name: 'Proxy Authentication Required',
+    description: 'The client must first authenticate itself with the proxy',
+  },
+  { code: 408, name: 'Request Timeout', description: 'The server timed out waiting for the request' },
+  { code: 409, name: 'Conflict', description: 'Indicates that the request could not be processed because of conflict' },
+  { code: 410, name: 'Gone', description: 'Indicates that the resource requested is no longer available' },
+  { code: 411, name: 'Length Required', description: 'The request did not specify the length of its content' },
+  { code: 412, name: 'Precondition Failed', description: 'The server does not meet one of the preconditions' },
+  {
+    code: 413,
+    name: 'Payload Too Large',
+    description: 'The request is larger than the server is willing or able to process',
+  },
+  { code: 414, name: 'URI Too Long', description: 'The URI provided was too long for the server to process' },
+  {
+    code: 415,
+    name: 'Unsupported Media Type',
+    description: 'The request entity has a media type which the server or resource does not support',
+  },
+  {
+    code: 416,
+    name: 'Range Not Satisfiable',
+    description: 'The client has asked for a portion of the file but the server cannot supply that portion',
+  },
+  {
+    code: 417,
+    name: 'Expectation Failed',
+    description: 'The server cannot meet the requirements of the Expect header',
+  },
+  { code: 418, name: "I'm a teapot", description: 'This server is a teapot' },
+  {
+    code: 419,
+    name: 'Page Expired',
+    description: 'Indicate that the Cross-Site Request Forgery (CSRF) validation has failed',
+    outsideSpec: true,
+    specificTo: 'Laravel',
+  },
+  {
+    code: 420,
+    name: 'Method Failure',
+    description: 'Indicates that a method has failed',
+    deprecated: true,
+    outsideSpec: true,
+    specificTo: 'Spring Framework',
+  },
+  {
+    code: 421,
+    name: 'Misdirected Request',
+    description: 'The request was directed at a server that is not able to produce a response',
+  },
+  { code: 422, name: 'Unprocessable Entity', description: 'The request was well-formed but was unable to be followed' },
+  { code: 423, name: 'Locked', description: 'The resource that is being accessed is locked' },
+  { code: 424, name: 'Failed Dependency', description: 'The request failed due to failure of a previous request' },
+  { code: 425, name: 'Too Early', description: 'The server is unwilling to risk processing a request' },
+  { code: 426, name: 'Upgrade Required', description: 'The client should switch to a different protocol' },
+  {
+    code: 428,
+    name: 'Precondition Required',
+    description: 'The origin server requires the request to be conditional',
+  },
+  {
+    code: 429,
+    name: 'Too Many Requests',
+    description: 'The user has sent too many requests in a given amount of time',
+  },
+  {
+    code: 430,
+    name: 'HTTP Status Code',
+    description: 'Indicates that the user has sent too many requests in a given amount of time',
+    outsideSpec: true,
+    specificTo: 'Shopify',
+  },
+  {
+    code: 431,
+    name: 'Request Header Fields Too Large',
+    description: 'The server is unwilling to process the request because its header fields are too large',
+  },
+  {
+    code: 451,
+    name: 'Unavailable For Legal Reasons',
+    description: 'The server is denying access to the resource as a consequence of a legal demand',
+  },
+  {
+    code: 500,
+    name: 'Internal Server Error',
+    description: 'The server encountered an unexpected condition that prevented it from fulfilling the request',
+  },
+  { code: 501, name: 'Not Implemented', description: 'The server does not support the functionality required' },
+  {
+    code: 502,
+    name: 'Bad Gateway',
+    description:
+      'The server was acting as a gateway or proxy and received an invalid response from the upstream server',
+  },
+  { code: 503, name: 'Service Unavailable', description: 'The server is currently unavailable' },
+  { code: 504, name: 'Gateway Timeout', description: 'The server was acting as a gateway or proxy' },
+  {
+    code: 505,
+    name: 'HTTP Version Not Supported',
+    description: 'The server does not support the HTTP protocol version used in the request',
+  },
+  {
+    code: 506,
+    name: 'Variant Also Negotiates',
+    description: 'Transparent content negotiation for the request results in a circular reference',
+  },
+  { code: 507, name: 'Insufficient Storage', description: 'The server is unable to store the representation' },
+  {
+    code: 508,
+    name: 'Loop Detected',
+    description: 'The server detected an infinite loop while processing the request',
+  },
+  { code: 510, name: 'Not Extended', description: 'Further extensions to the request are required' },
+  {
+    code: 511,
+    name: 'Network Authentication Required',
+    description: 'The client needs to authenticate to gain network access',
+  },
+  {
+    code: 599,
+    name: 'Network Connect Timeout Error',
+    description: 'Indicates that a connection to the upstream server timed out',
+    outsideSpec: true,
+  },
+  {
+    code: 600,
+    name: 'Unparseable Response Headers',
+    description: 'Indicates that the response headers received are not in a valid format',
+    outsideSpec: true,
+  },
+  {
+    code: 999,
+    name: 'Unauthorized',
+    description: 'Indicates that the request requires user authentication',
+    outsideSpec: true,
+  },
+];
