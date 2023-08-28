@@ -1,8 +1,5 @@
 {
   "$schema": "https://unpkg.com/knip@2/schema.json",
-  "next": {
-    "entry": ["next.config.{js,ts,cjs,mjs}", "{app,pages}/**/*.{js,jsx,ts,tsx}", "src/{app,pages}/**/*.{js,jsx,ts,tsx}"]
-  },
-  "ignore": ["next-env.d.ts", "postcss.config.js", "tailwind.config.js", "prettier.config.cjs"],
-  "ignoreDependencies": ["autoprefixer", "postcss", "prettier-plugin-tailwindcss", "eslint-config-next"]
+  "eslint": "./.eslintrc.json",
+  "ignore": ["next-env.d.ts"]
 }
