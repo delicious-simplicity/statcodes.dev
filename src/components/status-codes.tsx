@@ -1,7 +1,7 @@
-'use client';
-
+import { type ParsedSearchParams } from '~/app/page';
+import { STATUS_CODES } from '~/lib/status-codes';
 import { cn } from '~/lib/utils';
-import { useSearchAndFilter } from './search-and-filter-provider';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 
 const rangeTitleMap: Record<number, string> = {
@@ -12,12 +12,60 @@ const rangeTitleMap: Record<number, string> = {
   5: 'Server Error',
 };
 
-export const StatusCodes = () => {
-  const { filteredStatusCodeRanges, extras } = useSearchAndFilter();
+const getHttpStatusCodes = ({ codeRange, search, extras }: ParsedSearchParams) => {
+  let statusCodes = STATUS_CODES;
+
+  if (search) {
+    statusCodes = statusCodes.filter(({ code, name }) => {
+      const codeMatch = code.toString().includes(search);
+      const nameMatch = name.toLowerCase().includes(search.toLowerCase());
+
+      return codeMatch || nameMatch;
+    });
+  }
+
+  if (codeRange) {
+    statusCodes = statusCodes.filter(({ code, deprecated, outsideSpec }) => {
+      const codeMatch = codeRange.includes(Math.floor(code / 100));
+      if (deprecated && !extras?.deprecated) return false;
+      if (outsideSpec && !extras?.outsideSpec) return false;
+
+      return codeMatch;
+    });
+  }
+
+  if (!codeRange && !search) {
+    statusCodes = statusCodes.filter(({ code, deprecated, outsideSpec }) => {
+      if (code >= 200 && code <= 600 && !deprecated && !outsideSpec) return true;
+      return false;
+    });
+  }
+
+  const statusCodesMap = statusCodes.reduce(
+    (acc, statusCode) => {
+      const codeRange = Math.floor(statusCode.code / 100);
+
+      if (!acc[codeRange] || !Array.isArray(acc[codeRange])) {
+        acc[codeRange] = [statusCode];
+        return acc;
+      }
+      if (acc[codeRange] && Array.isArray(acc[codeRange])) {
+        (acc[codeRange] as (typeof statusCodes)[number][]).push(statusCode);
+      }
+      return acc;
+    },
+    {} as Record<number, (typeof statusCodes)[number][]>,
+  );
+
+  return statusCodesMap;
+};
+
+export const StatusCodes = ({ pageParams }: { pageParams: ParsedSearchParams }) => {
+  const statusCodes = getHttpStatusCodes(pageParams);
 
   return (
     <>
-      {Object.entries(filteredStatusCodeRanges).map(([range, statuses]) => {
+      {Object.entries(statusCodes).map(([range, statuses]) => {
         return (
           <section key={range} className='pb-12'>
             <h2
@@ -40,37 +88,28 @@ export const StatusCodes = () => {
               )}
             </h2>
             <section className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
-              {statuses
-                .filter(({ deprecated, outsideSpec }) => {
-                  if (typeof deprecated === 'undefined' && typeof outsideSpec === 'undefined') return true;
-                  if (typeof deprecated === 'undefined' && extras.includes('outsideSpec') && outsideSpec) return true;
-                  if (typeof outsideSpec === 'undefined' && extras.includes('deprecated') && deprecated) return true;
-                  if (extras.includes('deprecated') && deprecated) return true;
-                  if (extras.includes('outsideSpec') && outsideSpec) return true;
-                  return false;
-                })
-                .map(({ code, description, name, deprecated, outsideSpec }) => {
-                  return (
-                    <Card
-                      className={cn(
-                        'group min-h-[142px] hover:cursor-pointer',
-                        outsideSpec && 'border-yellow-500 dark:border-yellow-500',
-                        deprecated && 'border-red-500 dark:border-red-500',
-                      )}
-                      key={code}
-                      // onClick={() => router.push(`/${code}`)}
-                    >
-                      <CardHeader>
-                        <CardTitle title={name} className='truncate text-xl group-hover:underline'>
-                          <span className='font-mono'>{code}</span> - {name}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <CardDescription>{description}</CardDescription>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
+              {statuses.map(({ code, description, name, deprecated, outsideSpec }) => {
+                return (
+                  <Card
+                    className={cn(
+                      'group min-h-[142px] hover:cursor-pointer',
+                      outsideSpec && 'border-yellow-500 dark:border-yellow-500',
+                      deprecated && 'border-red-500 dark:border-red-500',
+                    )}
+                    key={code}
+                    // onClick={() => router.push(`/${code}`)}
+                  >
+                    <CardHeader>
+                      <CardTitle title={name} className='truncate text-xl group-hover:underline'>
+                        <span className='font-mono'>{code}</span> - {name}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <CardDescription>{description}</CardDescription>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </section>
           </section>
         );

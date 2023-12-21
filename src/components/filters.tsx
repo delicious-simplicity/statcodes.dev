@@ -1,65 +1,97 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+
+import { ActiveFilters } from '~/app/page';
 import { splitCamelAndCapitalize, splitCamelAndLowercase } from '~/lib/utils';
-import { useSearchAndFilter } from './search-and-filter-provider';
+
 import { Toggle } from './ui/toggle';
 
-export const Filters = () => {
-  const { statusCodeRanges, extras, codeRange, setExtras, setCodeRange } = useSearchAndFilter();
+export const Filters = ({ filters }: { filters: ActiveFilters }) => {
+  const router = useRouter();
 
   return (
     <section className='flex flex-col pb-8 font-mono sm:flex-row sm:justify-between sm:pb-12'>
       {/* status code filters */}
       <div className='grid grid-cols-5 gap-2 sm:grid-cols-7'>
-        {Object.entries(statusCodeRanges)
-          .filter(([, status]) => {
-            const filteredStatuses = status.filter(({ deprecated, outsideSpec }) => {
-              if (typeof deprecated === 'undefined' && typeof outsideSpec === 'undefined') return true;
-              if (typeof deprecated === 'undefined' && extras.includes('outsideSpec') && outsideSpec) return true;
-              if (typeof outsideSpec === 'undefined' && extras.includes('deprecated') && deprecated) return true;
-              if (extras.includes('deprecated') && deprecated) return true;
-              if (extras.includes('outsideSpec') && outsideSpec) return true;
-              return false;
-            });
-            if (filteredStatuses.length) return true;
-            return false;
-          })
-          .map(([range]) => {
-            return (
-              <Toggle
-                variant={`outline-${range}` as 'outline-1'}
-                aria-label={`Toggle ${range}00 status code range`}
-                key={range}
-                pressed={codeRange.includes(Number(range))}
-                onClick={() =>
-                  setCodeRange((prev) => {
-                    if (prev.includes(Number(range))) return prev.filter((r) => r !== Number(range));
-                    return [...prev, Number(range)];
-                  })
+        {Object.entries(filters.activeCodeRanges).map(([range, active]) => {
+          return (
+            <Toggle
+              variant={`outline-${range}` as 'outline-1'}
+              aria-label={`Toggle ${range}00 status code range`}
+              key={range}
+              pressed={active}
+              onClick={() => {
+                const url = new URL(window.location.origin);
+                const params = new URLSearchParams(url.search);
+
+                let activeCodeRanges = [];
+                if (active) {
+                  for (const activeCodeRange in filters.activeCodeRanges) {
+                    if (filters.activeCodeRanges[activeCodeRange] && activeCodeRange !== range)
+                      activeCodeRanges.push(activeCodeRange);
+                  }
+                } else {
+                  for (const activeCodeRange in filters.activeCodeRanges) {
+                    if (activeCodeRange === range || filters.activeCodeRanges[activeCodeRange])
+                      activeCodeRanges.push(activeCodeRange);
+                  }
                 }
-              >
-                {range}xx
-              </Toggle>
-            );
-          })}
+                activeCodeRanges.length > 0 && params.set('codeRange', activeCodeRanges.join(','));
+
+                let activeExtras = [];
+                for (const extra in filters.activeExtras) {
+                  if (filters.activeExtras[extra as 'deprecated']) activeExtras.push(extra);
+                }
+                activeExtras.length > 0 && params.set('extras', activeExtras.join(','));
+
+                url.search = params.toString();
+                const urlString = url.toString();
+                router.replace(urlString);
+              }}
+            >
+              {range}xx
+            </Toggle>
+          );
+        })}
       </div>
 
       {/* extra filters */}
       <div className='pt-2 sm:pt-0'>
-        {(['deprecated', 'outsideSpec'] as ['deprecated', 'outsideSpec']).map((extraFilter) => {
+        {Object.entries(filters.activeExtras).map(([extraFilter, active]) => {
           return (
             <Toggle
               className='mr-2'
               variant='outline'
-              aria-label={`Toggle ${splitCamelAndLowercase(extraFilter)} status codes`}
+              aria-label={`Toggle ${splitCamelAndLowercase(extraFilter as 'deprecated')} status codes`}
               key={extraFilter}
-              pressed={extras.includes(extraFilter)}
-              onClick={() =>
-                setExtras((prev) => {
-                  if (prev.includes(extraFilter)) return prev.filter((r) => r !== extraFilter);
-                  return [...prev, extraFilter];
-                })
-              }
+              pressed={active}
+              onClick={() => {
+                const url = new URL(window.location.origin);
+                const params = new URLSearchParams(url.search);
+
+                let activeCodeRanges = [];
+                for (const activeCodeRange in filters.activeCodeRanges) {
+                  if (filters.activeCodeRanges[activeCodeRange]) activeCodeRanges.push(activeCodeRange);
+                }
+                activeCodeRanges.length > 0 && params.set('codeRange', activeCodeRanges.join(','));
+
+                let activeExtras = [];
+                if (active) {
+                  for (const extra in filters.activeExtras) {
+                    if (filters.activeExtras[extra as 'deprecated'] && extra !== extraFilter) activeExtras.push(extra);
+                  }
+                } else {
+                  for (const extra in filters.activeExtras) {
+                    if (extra === extraFilter || filters.activeExtras[extra as 'deprecated']) activeExtras.push(extra);
+                  }
+                }
+                activeExtras.length > 0 && params.set('extras', activeExtras.join(','));
+
+                url.search = params.toString();
+                const urlString = url.toString();
+                router.replace(urlString);
+              }}
             >
               {/* split on capital letters */}
               {splitCamelAndCapitalize(extraFilter)}
